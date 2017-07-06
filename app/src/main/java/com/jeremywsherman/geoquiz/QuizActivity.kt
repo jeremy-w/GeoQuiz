@@ -11,20 +11,18 @@ class QuizActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
-        val trueButton = findViewById<Button>(R.id.true_button)
-        trueButton.setOnClickListener {
-            Toast
-                .makeText(this@QuizActivity, R.string.toast_correct, Toast.LENGTH_SHORT)
-                .apply { setGravity(Gravity.TOP, 0, 0) }
-                .show()
-        }
-
-        val falseButton: Button = findViewById(R.id.false_button)
-        falseButton.setOnClickListener {
-            Toast
-                .makeText(this@QuizActivity, R.string.toast_incorrect, Toast.LENGTH_SHORT)
-                .apply { setGravity(Gravity.TOP, 0, 0) }
-                .show()
-        }
+        listOf(
+            R.id.true_button to R.string.toast_correct,
+            R.id.false_button to R.string.toast_incorrect
+            )
+            .map { findViewById<Button>(it.first) to it.second}
+            .forEach { (button, textID) ->
+                button.setOnClickListener {
+                    Toast
+                        .makeText(this@QuizActivity, textID, Toast.LENGTH_SHORT)
+                        .apply { setGravity(Gravity.TOP, 0, 0) }
+                        .show()
+                }
+            }
     }
 }
