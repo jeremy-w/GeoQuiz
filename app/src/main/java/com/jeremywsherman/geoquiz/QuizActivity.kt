@@ -24,6 +24,10 @@ class QuizActivity : AppCompatActivity() {
         setContentView(R.layout.activity_quiz)
         true_button.setOnClickListener { didAnswer(true) }
         false_button.setOnClickListener { didAnswer(false) }
+        next_button.setOnClickListener {
+            currentQuestionIndex = (currentQuestionIndex + 1) % questions.size
+            questionIndexDidChange()
+        }
 
         questionIndexDidChange()
     }
@@ -38,7 +42,7 @@ class QuizActivity : AppCompatActivity() {
 
         Toast
             .makeText(this@QuizActivity, toastTextId, Toast.LENGTH_SHORT)
-            .apply { setGravity(Gravity.TOP, 0, 0) }
+//            .apply { setGravity(Gravity.TOP, 0, 0) }
             .show()
     }
 }
