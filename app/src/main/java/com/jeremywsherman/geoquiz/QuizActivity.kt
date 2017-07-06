@@ -17,6 +17,7 @@ class QuizActivity : AppCompatActivity() {
         Question(R.string.question_asia, true)
     )
     var currentQuestionIndex = 0
+    val currentQuestion get() = questions[currentQuestionIndex]
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,13 +29,11 @@ class QuizActivity : AppCompatActivity() {
     }
 
     private fun questionIndexDidChange() {
-        val question = questions[currentQuestionIndex]
-        question_text_view.setText(question.textResId)
+        question_text_view.setText(currentQuestion.textResId)
     }
 
     private fun didAnswer(isTrue: Boolean) {
-        val question = questions[currentQuestionIndex]
-        val isCorrect = question.isTrue == isTrue
+        val isCorrect = currentQuestion.isTrue == isTrue
         val toastTextId = if (isCorrect) R.string.toast_correct else R.string.toast_incorrect
 
         Toast
