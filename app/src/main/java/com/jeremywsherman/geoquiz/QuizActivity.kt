@@ -38,7 +38,8 @@ class QuizActivity : AppCompatActivity() {
         next_button.setOnClickListener(this::nextQuestionAction)
         question_text_view.setOnClickListener(this::nextQuestionAction)
 
-        answeredQuestionIndexes.addAll((savedInstanceState?.getIntArray(KEY_ANSWERED_INDEXES) ?: intArrayOf()).toTypedArray())
+        answeredQuestionIndexes.addAll(
+            savedInstanceState?.getIntArray(KEY_ANSWERED_INDEXES)?.toTypedArray() ?: arrayOf())
         currentQuestionIndex = savedInstanceState?.getInt(KEY_INDEX) ?: 0
         questionIndexDidChange()
     }
