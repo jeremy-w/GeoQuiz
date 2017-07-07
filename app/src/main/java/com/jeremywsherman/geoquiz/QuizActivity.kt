@@ -9,6 +9,14 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_quiz.*
 
 class QuizActivity : AppCompatActivity() {
+    companion object {
+        /** Used by [onSaveInstanceState] to save the [currentQuestionIndex]. */
+        private const val KEY_INDEX = "index"
+
+        /** Saves [answeredQuestionIndexes] as int array. */
+        private const val KEY_ANSWERED_INDEXES = "answered"
+    }
+
     val questions = arrayOf(
         Question(R.string.question_australia, true),
         Question(R.string.question_oceans, true),
@@ -17,8 +25,9 @@ class QuizActivity : AppCompatActivity() {
         Question(R.string.question_americas, true),
         Question(R.string.question_asia, true)
     )
-    var currentQuestionIndex = 0
+    private var currentQuestionIndex = 0
     val currentQuestion get() = questions[currentQuestionIndex]
+    val answeredQuestionIndexes = mutableSetOf<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +38,17 @@ class QuizActivity : AppCompatActivity() {
         next_button.setOnClickListener(this::nextQuestionAction)
         question_text_view.setOnClickListener(this::nextQuestionAction)
 
+        answeredQuestionIndexes.addAll((savedInstanceState?.getIntArray(KEY_ANSWERED_INDEXES) ?: intArrayOf()).toTypedArray())
+        currentQuestionIndex = savedInstanceState?.getInt(KEY_INDEX) ?: 0
         questionIndexDidChange()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        val bundle = outState ?: return
+
+        bundle.putInt(KEY_INDEX, currentQuestionIndex)
+        bundle.putIntArray(KEY_ANSWERED_INDEXES, answeredQuestionIndexes.toIntArray())
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -46,9 +65,21 @@ class QuizActivity : AppCompatActivity() {
 
     private fun questionIndexDidChange() {
         question_text_view.setText(currentQuestion.textResId)
+        questionAnsweredDidChange()
     }
 
+    private fun questionAnsweredDidChange() {
+        val shouldEnableAnswerButtons = !alreadyAnsweredQuestionAtIndex(currentQuestionIndex)
+        true_button.isEnabled = shouldEnableAnswerButtons
+        false_button.isEnabled = shouldEnableAnswerButtons
+    }
+
+    private fun  alreadyAnsweredQuestionAtIndex(index: Int) = index in answeredQuestionIndexes
+
     private fun didAnswer(isTrue: Boolean) {
+        recordAnsweredQuestionAtIndex(currentQuestionIndex)
+        questionAnsweredDidChange()
+
         val isCorrect = currentQuestion.isTrue == isTrue
         val toastTextId = if (isCorrect) R.string.toast_correct else R.string.toast_incorrect
 
@@ -57,4 +88,6 @@ class QuizActivity : AppCompatActivity() {
 //            .apply { setGravity(Gravity.TOP, 0, 0) }
             .show()
     }
+
+    private fun  recordAnsweredQuestionAtIndex(index: Int) = answeredQuestionIndexes.add(index)
 }
