@@ -25,15 +25,14 @@ class QuizActivity : AppCompatActivity() {
         Question(R.string.question_americas, true),
         Question(R.string.question_asia, true)
     )
-    private var currentQuestionIndex = 0
-    val currentQuestion get() = questions[currentQuestionIndex]
-    val answeredQuestionIndexes = mutableSetOf<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
-        true_button.setOnClickListener { didAnswer(true) }
-        false_button.setOnClickListener { didAnswer(false) }
+
+        true_button.setOnClickListener { answerQuestionAction(true) }
+        false_button.setOnClickListener { answerQuestionAction(false) }
+
         prev_button.setOnClickListener(this::prevQuestionAction)
         next_button.setOnClickListener(this::nextQuestionAction)
         question_text_view.setOnClickListener(this::nextQuestionAction)
@@ -52,6 +51,26 @@ class QuizActivity : AppCompatActivity() {
         bundle.putIntArray(KEY_ANSWERED_INDEXES, answeredQuestionIndexes.toIntArray())
     }
 
+
+    /** Provide feedback when the true/false button is clicked. */
+    private fun answerQuestionAction(isTrue: Boolean) {
+        recordAnsweredQuestionAtIndex(currentQuestionIndex)
+        questionAnsweredDidChange()
+
+        val isCorrect = currentQuestion.isTrue == isTrue
+        val toastTextId = if (isCorrect) R.string.toast_correct else R.string.toast_incorrect
+
+        Toast
+            .makeText(this@QuizActivity, toastTextId, Toast.LENGTH_SHORT)
+//            .apply { setGravity(Gravity.TOP, 0, 0) }
+            .show()
+    }
+
+
+    // region Tracking the Current Question
+    private var currentQuestionIndex = 0
+    val currentQuestion get() = questions[currentQuestionIndex]
+
     @Suppress("UNUSED_PARAMETER")
     private fun nextQuestionAction(view: View) {
         currentQuestionIndex = (currentQuestionIndex + 1) % questions.size
@@ -68,6 +87,11 @@ class QuizActivity : AppCompatActivity() {
         question_text_view.setText(currentQuestion.textResId)
         questionAnsweredDidChange()
     }
+    // endregion
+
+
+    // region Tracking Answered Questions
+    val answeredQuestionIndexes = mutableSetOf<Int>()
 
     private fun questionAnsweredDidChange() {
         val shouldEnableAnswerButtons = !alreadyAnsweredQuestionAtIndex(currentQuestionIndex)
@@ -77,18 +101,6 @@ class QuizActivity : AppCompatActivity() {
 
     private fun  alreadyAnsweredQuestionAtIndex(index: Int) = index in answeredQuestionIndexes
 
-    private fun didAnswer(isTrue: Boolean) {
-        recordAnsweredQuestionAtIndex(currentQuestionIndex)
-        questionAnsweredDidChange()
-
-        val isCorrect = currentQuestion.isTrue == isTrue
-        val toastTextId = if (isCorrect) R.string.toast_correct else R.string.toast_incorrect
-
-        Toast
-            .makeText(this@QuizActivity, toastTextId, Toast.LENGTH_SHORT)
-//            .apply { setGravity(Gravity.TOP, 0, 0) }
-            .show()
-    }
-
     private fun  recordAnsweredQuestionAtIndex(index: Int) = answeredQuestionIndexes.add(index)
+    // endregion
 }
