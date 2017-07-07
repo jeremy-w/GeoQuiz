@@ -3,6 +3,7 @@ package com.jeremywsherman.geoquiz
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Gravity
+import android.view.View
 import android.widget.Toast
 
 import kotlinx.android.synthetic.main.activity_quiz.*
@@ -24,11 +25,15 @@ class QuizActivity : AppCompatActivity() {
         setContentView(R.layout.activity_quiz)
         true_button.setOnClickListener { didAnswer(true) }
         false_button.setOnClickListener { didAnswer(false) }
-        next_button.setOnClickListener {
-            currentQuestionIndex = (currentQuestionIndex + 1) % questions.size
-            questionIndexDidChange()
-        }
+        next_button.setOnClickListener(this::nextQuestionAction)
+        question_text_view.setOnClickListener(this::nextQuestionAction)
 
+        questionIndexDidChange()
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun nextQuestionAction(view: View) {
+        currentQuestionIndex = (currentQuestionIndex + 1) % questions.size
         questionIndexDidChange()
     }
 
