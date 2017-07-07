@@ -25,6 +25,7 @@ class QuizActivity : AppCompatActivity() {
         setContentView(R.layout.activity_quiz)
         true_button.setOnClickListener { didAnswer(true) }
         false_button.setOnClickListener { didAnswer(false) }
+        prev_button.setOnClickListener(this::prevQuestionAction)
         next_button.setOnClickListener(this::nextQuestionAction)
         question_text_view.setOnClickListener(this::nextQuestionAction)
 
@@ -34,6 +35,12 @@ class QuizActivity : AppCompatActivity() {
     @Suppress("UNUSED_PARAMETER")
     private fun nextQuestionAction(view: View) {
         currentQuestionIndex = (currentQuestionIndex + 1) % questions.size
+        questionIndexDidChange()
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun prevQuestionAction(view: View) {
+        currentQuestionIndex = (currentQuestionIndex  + questions.size - 1) % questions.size
         questionIndexDidChange()
     }
 
