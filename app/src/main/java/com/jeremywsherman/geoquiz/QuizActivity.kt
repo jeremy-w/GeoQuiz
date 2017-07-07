@@ -15,6 +15,9 @@ class QuizActivity : AppCompatActivity() {
 
         /** Saves [answeredQuestionIndexes] as int array. */
         private const val KEY_ANSWERED_INDEXES = "answered"
+
+        /** Key for [correctlyAnsweredCount] int. */
+        private const val KEY_CORRECTLY_ANSWERED_COUNT = "correct"
     }
 
     val questions = arrayOf(
@@ -37,9 +40,12 @@ class QuizActivity : AppCompatActivity() {
         next_button.setOnClickListener(this::nextQuestionAction)
         question_text_view.setOnClickListener(this::nextQuestionAction)
 
-        answeredQuestionIndexes.addAll(
-            savedInstanceState?.getIntArray(KEY_ANSWERED_INDEXES)?.toTypedArray() ?: arrayOf())
-        currentQuestionIndex = savedInstanceState?.getInt(KEY_INDEX) ?: 0
+        if (savedInstanceState != null) {
+            currentQuestionIndex = savedInstanceState.getInt(KEY_INDEX)
+            answeredQuestionIndexes.addAll(
+                savedInstanceState.getIntArray(KEY_ANSWERED_INDEXES)?.toTypedArray() ?: arrayOf())
+            restoreCorrectlyAnsweredCount(savedInstanceState)
+        }
         questionIndexDidChange()
     }
 
@@ -49,20 +55,34 @@ class QuizActivity : AppCompatActivity() {
 
         bundle.putInt(KEY_INDEX, currentQuestionIndex)
         bundle.putIntArray(KEY_ANSWERED_INDEXES, answeredQuestionIndexes.toIntArray())
+        saveCorrectlyAnsweredCount(outState)
     }
 
 
     /** Provide feedback when the true/false button is clicked. */
     private fun answerQuestionAction(isTrue: Boolean) {
-        recordAnsweredQuestionAtIndex(currentQuestionIndex)
+        val isCorrect = currentQuestion.isTrue == isTrue
+        recordAnsweredQuestionAtIndex(currentQuestionIndex, isCorrect)
         questionAnsweredDidChange()
 
-        val isCorrect = currentQuestion.isTrue == isTrue
-        val toastTextId = if (isCorrect) R.string.toast_correct else R.string.toast_incorrect
+        showAnswerFeedbackToast(isCorrect)
+        showGradeIfQuizFinished()
+    }
 
+    private fun  showAnswerFeedbackToast(isCorrect: Boolean) {
+        val toastTextId = if (isCorrect) R.string.toast_correct else R.string.toast_incorrect
         Toast
             .makeText(this@QuizActivity, toastTextId, Toast.LENGTH_SHORT)
 //            .apply { setGravity(Gravity.TOP, 0, 0) }
+            .show()
+    }
+
+    private fun showGradeIfQuizFinished() {
+        if (answeredQuestionIndexes.size != questions.size) { return }
+
+        val message = getString(R.string.toast_score, quizPercentGrade)
+        Toast
+            .makeText(this, message, Toast.LENGTH_SHORT)
             .show()
     }
 
@@ -102,5 +122,25 @@ class QuizActivity : AppCompatActivity() {
     private fun  alreadyAnsweredQuestionAtIndex(index: Int) = index in answeredQuestionIndexes
 
     private fun  recordAnsweredQuestionAtIndex(index: Int) = answeredQuestionIndexes.add(index)
+    // endregion
+
+
+    // region Grading the Quiz
+    var correctlyAnsweredCount = 0
+
+    private fun  recordAnsweredQuestionAtIndex(index: Int, correctly: Boolean) {
+        if (correctly) { correctlyAnsweredCount += 1 }
+        answeredQuestionIndexes.add(index)
+    }
+
+    private fun saveCorrectlyAnsweredCount(bundle: Bundle) {
+        bundle.putInt(KEY_CORRECTLY_ANSWERED_COUNT, correctlyAnsweredCount)
+    }
+
+    private fun restoreCorrectlyAnsweredCount(bundle: Bundle) {
+        correctlyAnsweredCount  = bundle.getInt(KEY_CORRECTLY_ANSWERED_COUNT)
+    }
+
+    private val quizPercentGrade get() = correctlyAnsweredCount.toDouble() / questions.size * 100.0
     // endregion
 }

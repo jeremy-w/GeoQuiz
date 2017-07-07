@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">GeoQuiz</string>
     <string name="question_australia">Canberra is the capital of Australia.</string>
     <string name="question_oceans">The Pacific Ocean is larger than the Atlantic Ocean.</string>
@@ -12,4 +12,9 @@
     <string name="toast_correct">Correct!</string>
     <string name="toast_incorrect">Incorrect!</string>
     <string name="prev_button">Prev</string>
+
+    <!-- Shown when the last question is answered. The text is in a toast. -->
+    <string name="toast_score">
+        Quiz complete! Score: <xliff:g id="percent_score" example="39.25%">%1$.2f%%</xliff:g>
+    </string>
 </resources>
