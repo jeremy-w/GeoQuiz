@@ -18,3 +18,8 @@ If you hit a class-cast exception after hacking on your layout XML,
 do a full rebuild, and all should be well. This seems to happen when you use
 the same ID with a new widget type, like changing `@id/next_button` from
 `Button` to `ImageButton`.
+
+- Canonical project URL: https://github.com/jeremy-w/GeoQuiz
+- License: Derivative work of the BNR book, so probably, "It's complicated"
+- Author: [Jeremy W. Sherman](https://jeremywsherman.com), GitHub/GitLab @jeremy-w
+- Maintainer: **Unmaintained**
